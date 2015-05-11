@@ -16,7 +16,6 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 
 setup(
     name='pheno',
-    version='1.0.0a0',
     description='Genetic programming for arbitrary domains',
     long_description=long_description,
     url='https://github.com/hosford42/xcs',
