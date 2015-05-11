@@ -20,20 +20,19 @@
 #       incorporate type constraints.
 #
 # =============================================================================
-#!/usr/bin/env python
 
-'''pheno.trees
+"""pheno.trees
 
 The pheno.trees submodule contains tools for applying evolutionary algorithms
 to trees and forests.
-'''
+"""
 
 # Future plans:
-    # - Add a Forest class and use it instead of the dictionary of trees
-    #   currently used.
-    # - Add a TreeEncoding, for when only one tree is desired as the phenotype.
-    # - Revise the ForestEncoding class to make use of the TreeEncoding class.
-    # - Move path generation out
+#    - Add a Forest class and use it instead of the dictionary of trees
+#      currently used.
+#    - Add a TreeEncoding, for when only one tree is desired as the phenotype.
+#    - Revise the ForestEncoding class to make use of the TreeEncoding class.
+#    - Move path generation out
 
 
 # Standard library imports
@@ -77,12 +76,12 @@ class Type:
 
     @property
     def name(self):
-        '''The name of this type.'''
+        """The name of this type."""
         return self._name
 
     @property
     def description(self):
-        '''A short description of this type.'''
+        """A short description of this type."""
         return self._description
 
     def __str__(self):
@@ -122,7 +121,7 @@ class Type:
         return self.has_ancestor(other)
 
     def inherit_from(self, other):
-        '''Add the other type as a direct ancestor of this one.'''
+        """Add the other type as a direct ancestor of this one."""
         if not isinstance(other, Type):
             raise TypeError(other)
         if self <= other or self is self.anything():
@@ -130,8 +129,8 @@ class Type:
         self._parents.add(other)
 
     def has_ancestor(self, other):
-        '''Return whether there is any path of inheritance from the other type
-        to this one.'''
+        """Return whether there is any path of inheritance from the other type
+        to this one."""
         if not isinstance(other, Type):
             raise TypeError(other)
 
@@ -152,16 +151,15 @@ class Type:
         return False
 
     def has_descendant(self, other):
-        '''Return whether there is any path of inheritance from this type to
-        the other one.'''
+        """Return whether there is any path of inheritance from this type to
+        the other one."""
         if not isinstance(other, Type):
             raise TypeError(other)
         return other.has_ancestor(self)
 
 
-
 class ChildConstraints:
-    "Represents a set of constraints that apply to the children of a tree node."
+    """Represents a set of constraints that apply to the children of a tree node."""
 
     def __init__(self, min=0, max=None, types=None, repeat_type=None):
         self._min = int(min or 0)
@@ -188,30 +186,30 @@ class ChildConstraints:
 
     @property
     def min(self):
-        '''The minimum number of children permitted.'''
+        """The minimum number of children permitted."""
         return self._min
 
     @property
     def max(self):
-        '''The maximum number of children permitted, or None if unlimited.'''
+        """The maximum number of children permitted, or None if unlimited."""
         return self._max
 
     @property
     def types(self):
-        '''The initial child types. If a child index falls within the length of
+        """The initial child types. If a child index falls within the length of
         this tuple, its type is governed by the type at the corresponding index
-        of this tuple.'''
+        of this tuple."""
         return self._types
 
     @property
     def repeat_type(self):
-        '''The repeated child type. If an child index is greater than the
-        length of the types tuple, its type is governed by this type.'''
+        """The repeated child type. If an child index is greater than the
+        length of the types tuple, its type is governed by this type."""
         return self._repeat_type
 
     def satisfied_by(self, types):
-        '''Return whether the given sequence of child types satisfies the child
-        constraints.'''
+        """Return whether the given sequence of child types satisfies the child
+        constraints."""
         if not isinstance(types, (list, tuple)):
             types = tuple(types)
         if len(types) < self._min:
@@ -229,7 +227,7 @@ class ChildConstraints:
 
 
 class TypedTree(Tree):
-    '''A typed tree, as an evolutionary phenotype.'''
+    """A typed tree, as an evolutionary phenotype."""
 
     def __init__(self, type, value, subtrees=()):
         super().__init__(value, subtrees)
@@ -237,12 +235,12 @@ class TypedTree(Tree):
 
     @property
     def type(self):
-        '''The type of this node of the tree.'''
+        """The type of this node of the tree."""
         return self._type
 
     def to_str(self, indentation=''):
-        '''A multi-line string representation of this tree, at the requested
-        level of indentation.'''
+        """A multi-line string representation of this tree, at the requested
+        level of indentation."""
         result = indentation + str(self._value)
         if self._type.name[:1].lower() in 'aeiou':
             result += ' as an '
@@ -255,7 +253,7 @@ class TypedTree(Tree):
 
 
 class TypedTreeCodonFactory(CodonFactory):
-    '''The codon factory used by ForestEncoding.'''
+    """The codon factory used by ForestEncoding."""
 
     def __init__(self, value_generator, element_generator=None,
                  type_generator=None, termination_condition=None):
@@ -266,27 +264,27 @@ class TypedTreeCodonFactory(CodonFactory):
 
     @property
     def value_generator(self):
-        '''The function used to generate random values.'''
+        """The function used to generate random values."""
         return self._value_generator
 
     @property
     def element_generator(self):
-        '''The function, if any, that is used to generate path elements.'''
+        """The function, if any, that is used to generate path elements."""
         return self._element_generator
 
     @property
     def type_generator(self):
-        '''The function, if any, that is used to generate types.'''
+        """The function, if any, that is used to generate types."""
         return self._type_generator
 
     @property
     def termination_condition(self):
-        '''The function, if any, that is used to determine when a path should
-        stop growing.'''
+        """The function, if any, that is used to determine when a path should
+        stop growing."""
         return self._termination_condition
 
     def get_random_path_element(self):
-        '''Get a random element for use in paths.'''
+        """Get a random element for use in paths."""
         if self._element_generator:
             return self._element_generator()
 
@@ -299,7 +297,7 @@ class TypedTreeCodonFactory(CodonFactory):
             return Path.parent
 
     def get_random_address(self):
-        '''Get a random address.'''
+        """Get a random address."""
         elements = []
         while (self._termination_condition(elements)
                if self._termination_condition
@@ -311,18 +309,18 @@ class TypedTreeCodonFactory(CodonFactory):
             return Path(elements)
 
     def get_random_value(self, address):
-        '''Get a random value.'''
+        """Get a random value."""
         return self._value_generator(address)
 
 
-class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
-    '''
+class ForestEncoding(GeneticEncoding):
+    """
     Forest phenotype builder. Requires addresses to be paths.
 
     NOTE:
         This is an abstract class. You must override get_random_genotype() in
         the subclass.
-    '''
+    """
 
     def __init__(self, codon_factory, default_root=None):
         if not isinstance(codon_factory, TreeCodonFactory):
@@ -331,7 +329,7 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
         self.default_root = default_root
 
     def build_address_space(self, chromosome, default_root=None):
-        '''Build the address space for a chromosome.'''
+        """Build the address space for a chromosome."""
         address_space = {}
         current_path = Path()
         if default_root is None:
@@ -345,7 +343,7 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
 
     @staticmethod
     def prune_address_space(address_space, sorted_addresses=None):
-        '''Prune the address space.'''
+        """Prune the address space."""
         if sorted_addresses is None:
             sorted_addresses = sorted(address_space, key=len)
         for address in sorted_addresses:
@@ -356,8 +354,8 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
 
     @staticmethod
     def build_child_map(address_space):
-        '''Identify children of each address in the address space, placing them
-        into a hierarchical map.'''
+        """Identify children of each address in the address space, placing them
+        into a hierarchical map."""
         children = {}
         for address in address_space:
             if address.is_root:
@@ -366,12 +364,12 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
             if parent in children:
                 children[parent].add(address.elements[-1])
             else:
-                children[parent] = set([address.elements[-1]])
+                children[parent] = {address.elements[-1]}
         return children
 
     @staticmethod
     def build_tree(children, address_space, sorted_addresses=None):
-        '''Build the tree from the child map.'''
+        """Build the tree from the child map."""
         if sorted_addresses is None:
             sorted_addresses = sorted(address_space, key=len)
         trees = {}
@@ -384,8 +382,8 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
                 trees[address] = Tree(address_space[address], subtrees)
         return trees[Path()]
 
-    def decode(self, genotype, default_root=None): #pylint: disable=arguments-differ
-        '''Construct the phenotype represented by the genotype.'''
+    def decode(self, genotype, default_root=None):
+        """Construct the phenotype represented by the genotype."""
         forest = {}
 
         for chromosome_id in genotype.iter_chromosome_ids():
@@ -394,7 +392,7 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
             # Build address space
             address_space = self.build_address_space(chromosome, default_root)
             if Path() not in address_space:
-                continue # We can't build a tree without a value at the root
+                continue  # We can't build a tree without a value at the root
 
             # Sort the addresses
             sorted_addresses = sorted(address_space, key=len)
@@ -415,7 +413,7 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
         return forest
 
     def decompose_tree(self, tree, path=None, address_space=None):
-        '''Decompose a tree into a minimal address space that represents it.'''
+        """Decompose a tree into a minimal address space that represents it."""
         if path is None:
             path = Path()
         if address_space is None:
@@ -432,8 +430,8 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
 
     @staticmethod
     def determine_bloat(forest, target_size):
-        '''Determine how many non-coding codons to add to each forest's
-        chromosome in order to reach the target size.'''
+        """Determine how many non-coding codons to add to each forest's
+        chromosome in order to reach the target size."""
         if not target_size:
             return {}
         total_size = sum(tree.size() for tree in forest.itervalues())
@@ -455,7 +453,7 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
         return bloat
 
     def apply_bloat(self, codons, address_space, amount):
-        '''Add random, non-coding codons.'''
+        """Add random, non-coding codons."""
         while amount > 0:
             index = random.randint(0, len(codons))
             if index == len(codons) or random.randrange(2):
@@ -474,8 +472,8 @@ class ForestEncoding(GeneticEncoding): #pylint: disable=abstract-method
                 codons.insert(index, codon)
             amount -= 1
 
-    def encode(self, phenotype, target_size=None): #pylint: disable=arguments-differ
-        '''Construct a genotype that represents the phenotype.'''
+    def encode(self, phenotype, target_size=None):
+        """Construct a genotype that represents the phenotype."""
         if isinstance(phenotype, dict):
             forest = phenotype
         else:

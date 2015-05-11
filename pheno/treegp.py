@@ -19,26 +19,25 @@
 #     - Created this module.
 #
 # =============================================================================
-#!/usr/bin/env python
 
-'''pheno.treegp
+"""pheno.treegp
 
 The pheno.treegp submodule contains tools for applying evolutionary algorithms
 to program trees and forests.
-'''
+"""
 
 
 # Future plans:
-    # - ArgumentConstraints still doesn't support more general constraints,
-    #   such as that different arguments possess the same unspecified type,
-    #   etc. However, it is good enough for current usage.
-    # - Add symbols. Their values should depend on the execution context passed
-    #   in during evaluation. Some code was previously written for this, which
-    #   I have archived for safe keeping, but I didn't feel the design was
-    #   sufficiently well thought out to include at this point, so it has been
-    #   removed from this branch. For now, it should suffice to either use
-    #   hand-tailored functions, one per symbol, which return the symbols'
-    #   values, or use some sort of indexing into a value list.
+#    - ArgumentConstraints still doesn't support more general constraints,
+#      such as that different arguments possess the same unspecified type,
+#      etc. However, it is good enough for current usage.
+#    - Add symbols. Their values should depend on the execution context passed
+#      in during evaluation. Some code was previously written for this, which
+#      I have archived for safe keeping, but I didn't feel the design was
+#      sufficiently well thought out to include at this point, so it has been
+#      removed from this branch. For now, it should suffice to either use
+#      hand-tailored functions, one per symbol, which return the symbols'
+#      values, or use some sort of indexing into a value list.
 
 
 # Standard library imports
@@ -56,7 +55,7 @@ __all__ = [
 
 
 class Function:
-    '''A Python function, suitably wrapped for use in genetic programming.'''
+    """A Python function, suitably wrapped for use in genetic programming."""
 
     def __init__(self, name, implementation, arg_constraints, return_type=None,
                  control=False):
@@ -72,7 +71,7 @@ class Function:
         return self.name
 
     def get_return_type(self, arg_types):
-        '''Determine the return type given the argument types, and return it.'''
+        """Determine the return type given the argument types, and return it."""
         # Assume arg_types is legal.
         if callable(self.return_type):
             return self.return_type(arg_types)
@@ -111,8 +110,8 @@ class LiteralFactory:
 
 
 class ProgramNodeFactory:
-    '''Program node factory. Used to produce randomly selected functions and
-    literals from which a program may be constructed.'''
+    """Program node factory. Used to produce randomly selected functions and
+    literals from which a program may be constructed."""
 
     def __init__(self):
         self._functions = {}
@@ -168,10 +167,10 @@ class ProgramNodeFactory:
 #       is set, return a compilable tree, otherwise, return an interpretable
 #       tree.
 class ProgramForestEncoding(ForestEncoding):
-    '''
+    """
     Program forest phenotype builder. Addresses are paths, and values are
     functions or literal values.
-    '''
+    """
 
     def __init__(self, default_root=None):
         super().__init__()
@@ -179,7 +178,7 @@ class ProgramForestEncoding(ForestEncoding):
 
     @staticmethod
     def get_random_path_element():
-        '''Get a random element for use in paths.'''
+        """Get a random element for use in paths."""
         if random.randrange(2):
             return random.random()
         elif random.randrange(2):
@@ -188,14 +187,14 @@ class ProgramForestEncoding(ForestEncoding):
             return Path.parent
 
     def get_random_address(self):
-        '''Get a random address.'''
+        """Get a random address."""
         elements = []
         while random.randrange(2):
             elements.append(self.get_random_path_element())
         return Path(elements)
 
     def build_address_space(self, chromosome, default_root=None):
-        '''Build the address space for a chromosome.'''
+        """Build the address space for a chromosome."""
         address_space = {}
         current_path = Path()
         if default_root is None:
@@ -209,7 +208,7 @@ class ProgramForestEncoding(ForestEncoding):
 
     @staticmethod
     def prune_address_space(address_space, sorted_addresses=None):
-        '''Prune the address space.'''
+        """Prune the address space."""
         if sorted_addresses is None:
             sorted_addresses = sorted(address_space, key=len)
         for address in sorted_addresses:
@@ -220,8 +219,8 @@ class ProgramForestEncoding(ForestEncoding):
 
     @staticmethod
     def build_child_map(address_space):
-        '''Identify children of each address in the address space, placing them
-        into a hierarchical map.'''
+        """Identify children of each address in the address space, placing them
+        into a hierarchical map."""
         children = {}
         for address in address_space:
             if address.is_root:
@@ -230,12 +229,12 @@ class ProgramForestEncoding(ForestEncoding):
             if parent in children:
                 children[parent].add(address.elements[-1])
             else:
-                children[parent] = set([address.elements[-1]])
+                children[parent] = {address.elements[-1]}
         return children
 
     @staticmethod
     def build_tree(children, address_space, sorted_addresses=None):
-        '''Build the tree from the child map.'''
+        """Build the tree from the child map."""
         if sorted_addresses is None:
             sorted_addresses = sorted(address_space, key=len)
         trees = {}
@@ -248,8 +247,8 @@ class ProgramForestEncoding(ForestEncoding):
                 trees[address] = Tree(address_space[address], subtrees)
         return trees[Path()]
 
-    def decode(self, genotype, default_root=None): #pylint: disable=arguments-differ
-        '''Construct the phenotype represented by the genotype.'''
+    def decode(self, genotype, default_root=None):
+        """Construct the phenotype represented by the genotype."""
         forest = {}
 
         for chromosome_id in genotype.iter_chromosome_ids():
@@ -258,7 +257,7 @@ class ProgramForestEncoding(ForestEncoding):
             # Build address space
             address_space = self.build_address_space(chromosome, default_root)
             if Path() not in address_space:
-                continue # We can't build a tree without a value at the root
+                continue  # We can't build a tree without a value at the root
 
             # Sort the addresses
             sorted_addresses = sorted(address_space, key=len)
@@ -279,7 +278,7 @@ class ProgramForestEncoding(ForestEncoding):
         return forest
 
     def decompose_tree(self, tree, path=None, address_space=None):
-        '''Decompose a tree into a minimal address space that represents it.'''
+        """Decompose a tree into a minimal address space that represents it."""
         if path is None:
             path = Path()
         if address_space is None:
@@ -296,8 +295,8 @@ class ProgramForestEncoding(ForestEncoding):
 
     @staticmethod
     def determine_bloat(forest, target_size):
-        '''Determine how many non-coding codons to add to each forest's
-        chromosome in order to reach the target size.'''
+        """Determine how many non-coding codons to add to each forest's
+        chromosome in order to reach the target size."""
         if not target_size:
             return {}
         total_size = sum(tree.size() for tree in forest.itervalues())
@@ -319,7 +318,7 @@ class ProgramForestEncoding(ForestEncoding):
         return bloat
 
     def apply_bloat(self, codons, address_space, amount):
-        '''Add random, non-coding codons.'''
+        """Add random, non-coding codons."""
         while amount > 0:
             index = random.randint(0, len(codons))
             if index == len(codons) or random.randrange(2):
@@ -338,8 +337,8 @@ class ProgramForestEncoding(ForestEncoding):
                 codons.insert(index, codon)
             amount -= 1
 
-    def encode(self, phenotype, target_size=None): #pylint: disable=arguments-differ
-        '''Construct a genotype that represents the phenotype.'''
+    def encode(self, phenotype, target_size=None):
+        """Construct a genotype that represents the phenotype."""
         if isinstance(phenotype, dict):
             forest = phenotype
         else:

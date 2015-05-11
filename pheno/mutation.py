@@ -19,14 +19,13 @@
 #     - Created this module from code originally appearing in __init__.py.
 #
 # =============================================================================
-#!/usr/bin/env python
 
 
-'''pheno.mutation
+"""pheno.mutation
 
 The pheno.mutation submodule contains the mutation operators that come
 packaged with pheno.
-'''
+"""
 
 
 # Future plans:
@@ -47,8 +46,9 @@ __all__ = [
     'UniformPointMutationOperator',
 ]
 
-class MutationOperator(metaclass=ABCMeta): #pylint: disable=too-few-public-methods, abstract-class-little-used
-    '''Abstract base class for all mutation operators.'''
+
+class MutationOperator(metaclass=ABCMeta):
+    """Abstract base class for all mutation operators."""
 
     def __init__(self):
         pass
@@ -58,8 +58,8 @@ class MutationOperator(metaclass=ABCMeta): #pylint: disable=too-few-public-metho
         raise NotImplementedError()
 
 
-class UniformPointMutationOperator(MutationOperator): #pylint: disable=too-few-public-methods
-    '''Uniform-probability point mutation operator.'''
+class UniformPointMutationOperator(MutationOperator):
+    """Uniform-probability point mutation operator."""
 
     def __init__(self, point_probability=.001):
         super().__init__()
@@ -72,7 +72,7 @@ class UniformPointMutationOperator(MutationOperator): #pylint: disable=too-few-p
             codons = []
             for codon in chromosome.codons:
                 if random.random() < self.point_probability:
-                    codon = codon_generator() #pylint: disable=not-callable
+                    codon = codon_generator()
                 codons.append(codon)
             chromosome = Chromosome(codons)
             chromosomes[chromosome_id] = chromosome

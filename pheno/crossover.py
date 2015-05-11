@@ -19,14 +19,13 @@
 #     - Created this module from code originally appearing in __init__.py.
 #
 # =============================================================================
-#!/usr/bin/env python
 
 
-'''pheno.crossover
+"""pheno.crossover
 
 The pheno.crossover submodule contains the crossover operators that come
 packaged with pheno.
-'''
+"""
 
 
 # Future plans:
@@ -48,8 +47,8 @@ __all__ = [
 ]
 
 
-class CrossoverOperator(metaclass=ABCMeta): #pylint: disable=too-few-public-methods, no-init, abstract-class-little-used
-    '''Abstract base class for crossover operators.'''
+class CrossoverOperator(metaclass=ABCMeta):
+    """Abstract base class for crossover operators."""
 
     @abstractmethod
     def __call__(self, parent_weight_map):
@@ -57,25 +56,25 @@ class CrossoverOperator(metaclass=ABCMeta): #pylint: disable=too-few-public-meth
 
 
 class NPointMessyCrossoverOperator(CrossoverOperator):
-    '''N-point variable-length crossover.'''
+    """N-point variable-length crossover."""
 
     def __init__(self, points=2):
         self._points = int(points)
 
     @property
     def points(self):
-        '''The number of crossover points.'''
+        """The number of crossover points."""
         return self._points
 
     @staticmethod
     def get_total_weight(parent_weight_map, include=None):
-        '''Total up the weight for the included parents.'''
+        """Total up the weight for the included parents."""
         if include is None:
             include = parent_weight_map
         return float(sum(parent_weight_map[parent] for parent in include))
 
     def select_parents(self, candidates, parent_weight_map, total_weight=None):
-        '''Select which parents are to contribute to the child's chromosome.'''
+        """Select which parents are to contribute to the child's chromosome."""
         if total_weight is None:
             total_weight = self.get_total_weight(parent_weight_map, candidates)
 
@@ -89,17 +88,17 @@ class NPointMessyCrossoverOperator(CrossoverOperator):
         return selected_parents
 
     def determine_crossover_points(self, selected_parents, chromosome_id):
-        '''Select crossover points for each parent's chromosome.'''
+        """Select crossover points for each parent's chromosome."""
         points = {}
         for parent in selected_parents:
             points[parent] = sorted(
                 random.randint(0, len(parent.get_chromosome(chromosome_id)))
-                for index in range(self._points)
+                for _ in range(self._points)
             )
         return points
 
     def perform_crossover(self, selected_parents, points, chromosome_id):
-        '''Perform the crossover operation to create a new chromosome.'''
+        """Perform the crossover operation to create a new chromosome."""
         # Perform crossover on chromosomes
         child_codons = ()
         start = 0
@@ -113,9 +112,9 @@ class NPointMessyCrossoverOperator(CrossoverOperator):
         child_codons += parent.get_chromosome(chromosome_id).codons[end:]
         return Chromosome(child_codons)
 
-    def new_chromosome(self, chromosome_id, parent_weight_map, total_weight=None): #pylint: disable=line-too-long
-        '''Probabilistically create a new chromosome from the parents' based on
-        their respective weights.'''
+    def new_chromosome(self, chromosome_id, parent_weight_map, total_weight=None):
+        """Probabilistically create a new chromosome from the parents' based on
+        their respective weights."""
         if total_weight is None:
             total_weight = self.get_total_weight(parent_weight_map)
 
@@ -155,13 +154,13 @@ class NPointMessyCrossoverOperator(CrossoverOperator):
         )
 
     def __call__(self, parent_weight_map):
-        '''Apply the crossover operator to the parents, biasing selection of
+        """Apply the crossover operator to the parents, biasing selection of
         genetic material from each parent according to its given weight.
 
         NOTE:
-            Fitnesses must be >= 0.0. For the unweighted case, use 1.0 for each
+            Fitness must be >= 0.0. For the unweighted case, use 1.0 for each
             parent, not 0.0.
-        '''
+        """
         if not isinstance(parent_weight_map, dict):
             parent_weight_map = dict(parent_weight_map)
 
@@ -190,4 +189,5 @@ class NPointMessyCrossoverOperator(CrossoverOperator):
         # that preserve all genetic information of the parents, and also to
         # permit the return of empty lists in the case of child validation
         # checking.
+        # noinspection PyRedundantParentheses
         return (Genotype(child_chromosomes),)
